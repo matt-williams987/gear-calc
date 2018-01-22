@@ -3,44 +3,12 @@
 <head>
 </head>
 <body>
-<div id="gear"></div>
+
+<div id="sprockets" style="max-width:1000px;"></div>
+
 <script src="jquery.min.js"></script>
 <script src="svg.js"></script>
-<script type="text/javascript">
-"use strict"
-var draw = SVG('gear').size(500, 500)
-function createGear(draw, sides) {
-    var pitch = 25
-    var g = draw.group()
-    var r = pitch/(2 * Math.sin(Math.PI / sides))
-    var xs = []
-    var ys = []
-    var stringPoints = ""
-    for (var i = 0; i < sides; i++) {
-        xs[i] = r * Math.cos(2 * Math.PI * i / sides) + draw.width()/2
-        ys[i] = r * Math.sin(2 * Math.PI * i / sides) + draw.height()/2
-        stringPoints += xs[i].toFixed(3) + "," + ys[i].toFixed(3) + " "
-    }
-    g.polygon(stringPoints).fill('#000').stroke({ width: 0 })
-    var mask = g.mask()
-    var rect = g.rect(draw.width(), draw.height()).fill('#fff')
-    mask.add(rect)
-    for (var i =0; i < sides; i++){
-        mask.add(g.circle(pitch * 0.85).fill('#000').center(xs[i], ys[i]))
-    }
-    g.maskWith(mask)
-    return g
-}
-var gear = createGear(draw, 39)
+<script src="gear.js"></script>
 
-var start = null; 
-var step = function(timestamp) {
-  if (!start) start = timestamp;
-  var progress = timestamp - start;
-  gear.rotate(-progress/50)
-  window.requestAnimationFrame(step);
-}
-window.requestAnimationFrame(step);
-</script>
 </body>
 </html>
