@@ -7,41 +7,43 @@
 //    than masking the chain svg elements?
 //
 // 2. The chain does not mesh perfectly with the rear sprocket. There are graphical artifacts caused
-//    by the fact that the initial rotation and position of the rear gear is not set to mesh with
-//    the chain properly. This would take all sorts of clever math that I can't quite get my head
-//    around, although it's definitely possible. The behaviour at the moment is to mesh the chain
-//    only with the master gear. There are formulas to determine the "center-center" distance for
-//    two sprockets, but I don't seem to be able to make this work for my setup.
+//    by the fact that the initial rotation and position of the rear sprocker is not set to mesh
+//    with the chain properly. This would take all sorts of clever math that I can't quite get my
+//    head around, although it's definitely possible. The behaviour at the moment is to mesh the
+//    chain only with the master gear. There are formulas to determine the "center-center" distance
+//    for two sprockets, but I don't seem to be able to make this work for my setup.
 //
-// 3. It's disorganised beyond beleif.
+// 3. It's disorganised beyond beleif
 
 "use strict"
+/*global SVG:true*/
 
 var Drive = {}
+Drive.linkColor1 = "#aaa"
+Drive.linkColor2 = "#666"
 
-// This is the top object that contains the drivetrain. It takes 'draw' is a SVJ.js drawing object
-// that elements will be placed in to, and 'c' is a configuration object.
+// This is the top object that contains the drivetrain. It takes 'draw' as a SVJ.js drawing object
+// that elements will be placed in to, and c as the config.
 Drive.DriveTrain = function (draw, c) {
     this.draw = draw
     // Create a new group to contain everything that will be created.
     this.group = this.draw.group()
     // The 'master' gear contains the 'slave' gear, that is driven.
-    this.master = new Drive.Gear(this.group, c.s1Teeth, c.s1Loc[0], c.s1Loc[1], 
+    this.master = new Drive.Gear(this.group, c.master.t, c.master.x, c.master.y, 
         c.pitch, c.rollerDia, c.slave)
+    this.master.group.back()
+    this.master.slave.group.back()
     // The 'middle' contains everything that is connected by the two gears (master and slave). It's
     // also responsible for masking out the relevant links sections of the master and slave
     // sprockets, for some reason.
     this.middle = new Drive.Middle(this.master)
     this.master.setSpeed(c.speed)
-    this.db = new Drive.DebugOverlay(this.middle.cl, this.middle.cl2, this.master, 
-        this.master.slave, draw)
 }
 
 // Called every animation frame.
 Drive.DriveTrain.prototype.step = function (dt) {
     this.master.step(dt)
     this.middle.mesh()
-    this.db.step()
 }
 
 Drive.Gear = function(gr, t, x, y, pitch, roll, slave) {
@@ -52,15 +54,12 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave) {
     this.t = t // Number of teeth
     this.pitch = pitch // Distance between links
     this.roll = roll // Roller dimension
-    this.move = 0
-    this.angle = 0
+    this.angle = 0 // Current rotation - in degrees
     this.speed = 0.0 // Rotational speed
-    this.rotOffset = 0.0 // In degrees
-    // Circumradius for drawing the gear. Links travel on the inradius of the gear polygon
+    // Circumradius of the gear polygon. Used for drawing links and the gear
     this.cr = this.pitch / (2 * Math.sin(Math.PI / this.t))
-    // The links travel on the inradius
+    // Inradius of the gear polygon. Used for calculating distances, offsets and mechanical stuff
     this.r =  this.pitch / (2 * Math.tan(Math.PI / this.t)) 
-    // Draw a gear. Will be made more beautiful
     this.group = draw.group()
     this.points = Drive.polyPoints(this.cr, this.t, this.x, this.y)
     this.group.polygon(this.points).fill("#000")
@@ -68,27 +67,26 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave) {
     var circ = this.group.circle(this.r*2).center(this.x, this.y).fill("#fff")
     mask.add(circ)
     // Punch out circles at the vertexes of the polygon to give look of teeth
-    // This is to be replaced with actual graphics
     for (var i =0; i < this.t; i++){
         mask.add(this.group.circle(this.roll).fill("#000").center(
             this.points[i][0], this.points[i][1]))
     }
     this.group.maskWith(mask)
     this.links = new Drive.GearLinks(this)
-    this.group.rotate(this.angle - this.rotOffset)
+    this.group.rotate(this.angle)
+    // Create a slave gear if a slave configuration object has been passed in.
     if (this.slaveConf) {
-        var xx = this.slaveConf.x
-        var yy = this.slaveConf.y
-        this.slave = new Drive.Gear(this.sgroup, this.slaveConf.t, xx, yy, this.pitch, this.roll)
+        x = this.slaveConf.x
+        y = this.slaveConf.y
+        this.slave = new Drive.Gear(this.sgroup, this.slaveConf.t, x, y, this.pitch, this.roll)
     }
 }
 
 // The master gear step function is the only one that takes in a delta time (dt) value. Everything
 // else uses a "mesh" method to base location on current position of master gear.
 Drive.Gear.prototype.step = function(dt) {
-    this.move = dt * this.speed
-    this.angle += this.move
-    this.group.rotate(this.angle - this.rotOffset)
+    this.angle += dt * this.speed
+    this.group.rotate(this.angle)
     this.links.mesh()
     if (this.slave) {
         this.slave.mesh(this)
@@ -96,34 +94,48 @@ Drive.Gear.prototype.step = function(dt) {
 }
 
 Drive.Gear.prototype.setSpeed = function(speed) {
-    this.speed = speed
+    this.speed = speed * -0.01
 }
 
-// Used if this is a slave gear
-Drive.Gear.prototype.mesh = function(other) {
-    this.angle = other.angle * (other.t / this.t)
-    this.group.rotate(this.angle - this.rotOffset)
+Drive.Gear.prototype.mesh = function(master) {
+    this.angle = master.angle * (master.t / this.t)
+    this.group.rotate(this.angle)
     this.links.mesh()
 }
 
-
+// Gearlinks is responsible for drawing the portion of the chain wrapped around each sprocket.
 Drive.GearLinks = function (gear) {
     this.g = gear
-    // Supergroup to contain the links and mask. Links must move seperately from the mask (there is
-    // no mask right now)
+    // Supergroup to contain the links and mask. Links must move seperately from the mask, so need
+    // to be place in a subgroup.
     this.sgroup = gear.sgroup.group()
     this.group = this.sgroup.group()
-    // this.group = this.sgroup.group()
-    // Create the link poly points on the circumradius. Links travel on inradius, but to draw them
-    // there, we need to culcalte a polygon based on the circumradius
+    // Create the link poly points on the gear circumradius.
     var points = Drive.polyPoints(this.g.cr, this.g.t, this.g.x, this.g.y)
-    for (var i = 1; i < points.length; i += 2) {
+    for (var i = 2; i < points.length; i += 2) {
         this.group.line(points[i][0], points[i][1],
             points[i - 1][0], points[i - 1][1])
-            .stroke({ color: "#000", width: 10, opacity: 1.0 })
+            .stroke({ color: Drive.linkColor2, width: this.g.roll * 0.7})
+        this.group.line(points[i-1][0], points[i-1][1],
+            points[i - 2][0], points[i - 2][1])
+            .stroke({ color: Drive.linkColor1, width: this.g.roll * 0.7})
+    }
+    for (var i = 0; i < points.length; i += 1) {
+        this.group.circle(this.g.roll).center(points[i][0], points[i][1]).fill(Drive.linkColor1)
+        this.group.circle(this.g.roll * 0.35).center(points[i][0], points[i][1]).fill(Drive.linkColor2)
     }
     this.points = points
-    this.group.rotate(this.g.angle - this.g.rotOffset)
+    this.arcStep = Drive.toDeg((Math.PI * 2) / this.g.t * 2)
+    // This is a terrible hack that means sprocket drawing only works when gears are arranged left
+    // to right like in the gear calculator. If there are an odd number of teeth, GearLinks needs
+    // to leave a gap in the wrapped links. This makes sure that the gap on the slave gear points
+    // in and is not seen. This assumes the slave is on the right. Sad.
+    if (this.g.slaveConf === undefined) {
+        this.rotOffset = this.arcStep * Math.ceil(this.g.t / 4)
+    } else {
+        this.rotOffset = 0
+    }
+    this.group.rotate(this.g.angle)
 }
 
 // A method to apply the mask after the GearLinks have been created. To mask, we need to know where
@@ -137,7 +149,7 @@ Drive.GearLinks.prototype.mask = function(intercepts) {
 }
 
 Drive.GearLinks.prototype.mesh = function() {
-    this.group.rotate(this.g.angle - this.g.rotOffset)
+    this.group.rotate((this.g.angle % this.arcStep) + this.rotOffset)
 }
 
 // The Middle contains both chainline objects which are drawn between the gears.
@@ -145,6 +157,7 @@ Drive.Middle = function(master) {
     this.master = master
     this.cl = new Drive.Chainline(this.master, this.master.slave, this.master.links, true)
     this.cl2 = new Drive.Chainline(this.master, this.master.slave, this.master.links, false)
+    // Mas out the GearLinks which appear in the Middle.
     var linksMask = [
         [this.cl.line.x2, this.cl.line.y2],
         [this.cl2.line.x2, this.cl2.line.y2],
@@ -167,12 +180,11 @@ Drive.Chainline = function (gear, gear2, gearlinks, flip) {
     this.direction = flip ? 1: -1
     this.flip = flip
     this.links = gearlinks
-    this.sgroup = gear.sgroup
     this.gear = gear
     this.sgroup = gear.sgroup.group()
     this.group = this.sgroup.group()
     this.line = Drive.circTangentLine(gear2, gear, this.sgroup, flip)
-    this.arcStep = ((2 * Math.PI) / gear.t)
+    this.arcStep = ((2 * Math.PI) / gear.t) // Angle covered by the sproket in one tooth of movement
     this.createChainImage(this.line, this.group)
 }
 
@@ -182,7 +194,7 @@ Drive.Chainline.prototype.getDrawOffset = function () {
     var dp = (origin[0] * intercept[0]) + (origin[1] * intercept[1])
     var mag = Math.hypot(origin[0], origin[1]) * Math.hypot(intercept[0], intercept[1])
     var t = Math.acos(dp / mag)
-    return ((t % (this.arcStep * 2))- this.arcStep) * this.gear.r
+    return ((t % (this.arcStep * 2)) - this.arcStep) * this.gear.r
 }
 
 Drive.Chainline.prototype.mesh = function() {
@@ -194,29 +206,39 @@ Drive.Chainline.prototype.mesh = function() {
     this.group.move(x, y)
 }
 
-Drive.Chainline.prototype.createChainImage = function(line, group) {
+Drive.Chainline.prototype.createChainImage = function(line) {
     var xdist = line.x1 - line.x2
     var ydist = line.y1 - line.y2
     this.angle = Math.atan2(ydist, xdist)
     this.length = Math.hypot(xdist, ydist)
     var os = this.getDrawOffset()
-    // Can't get it to mesh elegantly at exactly the right moment, so just overlap it
-    // and mask the bad bits out. No idea how any of this works anymore
-    var ca = this.flip ? -11 : -10
-    var x = line.x2 + Math.cos(this.angle) * ((this.gear.pitch * ca) + os)
-    var y = line.y2 + Math.sin(this.angle) * ((this.gear.pitch * ca) + os)
-    var steps = this.length / (this.arcStep * 2 * this.gear.r) - ca
+    var ca = this.flip ? -3 : -2
+    if (this.gear.t % 2 !== 0 && this.flip) {
+        ca -= 1
+    }
+    var xStart = line.x2 + Math.cos(this.angle) * ((this.gear.pitch * ca) + os)
+    var yStart = line.y2 + Math.sin(this.angle) * ((this.gear.pitch * ca) + os)
+    var steps = this.length / (this.gear.pitch * 2) - ca
     var xmov = this.gear.pitch * Math.cos(this.angle)
     var ymov = this.gear.pitch * Math.sin(this.angle)
-    // This will be replaced with actual graphics.
+    var x = xStart
+    var y = yStart
     for (var i = 0; i < steps; i++) {
-        group.line(x, y, x + xmov, y + ymov).stroke({ color: "#000", width: 10})
+        this.group.line(x, y, x + xmov, y + ymov).stroke({ color: Drive.linkColor1, 
+            width: this.gear.roll * 0.7 })
+        this.group.circle(this.gear.roll).center(x, y).fill(Drive.linkColor1)
+        this.group.circle(this.gear.roll).center(x + xmov, y + ymov).fill(Drive.linkColor1)
+        this.group.circle(this.gear.roll * 0.35).center(x, y).fill(Drive.linkColor2)
+        this.group.circle(this.gear.roll * 0.35).center(x + xmov, y + ymov).fill(Drive.linkColor2)
         x += xmov * 2
         y += ymov * 2
     }
+    this.group.line(xStart, yStart, x, y).stroke({ color: Drive.linkColor2, 
+        width: this.gear.roll * 0.7 }).back()
+
     this.mask = this.group.mask()
-    this.mask.add(this.sgroup.line(line.x1, line.y1, line.x2, line.y2)
-        .stroke({ color: "#fff", width: 10 }))
+    this.mask.add(this.group.line(line.x1, line.y1, line.x2, line.y2)
+        .stroke({ color: "#fff", width: this.gear.roll}))
     this.sgroup.maskWith(this.mask)
 }
 
@@ -270,14 +292,6 @@ Drive.circTangentLine = function(c1, c2, draw, otherSide) {
     return {x1: x1, y1: y1, x2: x2, y2: y2}
 }
 
-Drive.betweenVector = function betweenVector (cx, cy, x1, y1, x2, y2) {
-    var a = [x1 - cx, y1 - cy]
-    var b = [x2 - cx, y2 - cy]
-    var dp = (a[0] * b[0]) + (a[1] * b[1])
-    var mag = Math.hypot(a[0], a[1]) * Math.hypot(b[0], b[1])
-    return Math.acos(dp/mag)
-}
-
 Drive.polyPoints = function(cr ,t, x, y) {
     var points = []
     for (var i = 0; i < t; i++) {
@@ -288,31 +302,10 @@ Drive.polyPoints = function(cr ,t, x, y) {
     return points
 }
 
-// Converts from degrees to radians.
 Drive.toRad = function (degrees) {
     return degrees * (Math.PI / 180)
 }
 
-var height = 500
-var width = 1500
-/*global SVG:true*/
-var draw = SVG("sprockets").viewbox(0, 0, width, height)
-var config = {
-    pitch: 25,
-    rollerDia: 18,
-    speed: -0.04,
-    s1Loc: [500, 250],
-    s1Teeth: 44,
-    slave: { t: 20, x: 1220, y: 250 }
+Drive.toDeg = function (radians) {
+    return radians * (180 / Math.PI)
 }
-var train = new Drive.DriveTrain(draw, config)
-
-var previous = 0
-var dt = 0
-var step = function(timestamp) {
-    dt = timestamp - previous
-    previous = timestamp
-    train.step(dt)
-    window.requestAnimationFrame(step)
-}
-window.requestAnimationFrame(step)
