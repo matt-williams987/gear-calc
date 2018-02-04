@@ -60,7 +60,7 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave) {
     this.cr = this.pitch / (2 * Math.sin(Math.PI / this.t))
     // Inradius of the gear polygon. Used for calculating distances, offsets and mechanical stuff
     this.r =  this.pitch / (2 * Math.tan(Math.PI / this.t)) 
-    this.group = draw.group()
+    this.group = this.sgroup.group()
     this.points = Drive.polyPoints(this.cr, this.t, this.x, this.y)
     this.group.polygon(this.points).fill("#000")
     var mask = this.group.mask()

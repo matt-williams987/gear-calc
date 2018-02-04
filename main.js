@@ -1,36 +1,48 @@
 "use strict"
 
-var config = {
+var Main = {}
+
+Main.config = {
     pitch: 12.7,
     rollerDia: 7.93,
-    speed: 4,
-    slave: { t: 15, x: 922, y: 512 },
-    master: { t: 43, x: 502, y: 595 }
+    speed: 20,
+    slave: { 
+        t: 18, 
+        x: 1232, 
+        y: 664
+    },
+    master: { 
+        t: 44,
+        x: 802, 
+        y: 745
+    },
+    height: 1200,
+    width: 1500
 }
 
-var height = 800
-var width = 1000
-var draw, train
+Main.draw = {}
+Main.rider = {}
+Main.train = {}
 
 //on ready
 $(function () {
     $("#driver_slider").slider({
         max: 60,
         min: 12,
-        value: config.master.t,
+        value: Main.config.master.t,
         slide: changeMaster
     })
     $("#slave_slider").slider({
         max: 48,
         min: 8,
         slide: changeSlave,
-        value: config.slave.t
+        value: Main.config.slave.t
     })
     $("#speed_slider").slider({
-        max: 20,
+        max: 150,
         min: 0,
         slide: changeSpeed,
-        value: config.speed
+        value: Main.config.speed
     })
     $("#rpm_slider").slider({
         max: 200,
@@ -44,21 +56,27 @@ $(function () {
 })
 
 function init() {
-    draw = SVG("sprockets").viewbox(0, 0, width, height)
+    Main.draw = SVG("sprockets").viewbox(0, 0, Main.config.width, Main.config.height)
     reset()
     animate()
 }
 
 function reset() {
-    $("#m-teeth").text(config.master.t)
-    $("#s-teeth").text(config.slave.t)
-    $("#speed").text(config.speed)
-    draw.clear()
-    var frame = draw.group()
-    train = new Drive.DriveTrain(draw, config)
-    frame.svg(SVGE.frame)
-    frame.back()
-    train.group.front()
+    $("#m-teeth").text(Main.config.master.t)
+    $("#s-teeth").text(Main.config.slave.t)
+    $("#speed").text(Main.config.speed)
+    Main.draw.clear()
+    Main.train = new Drive.DriveTrain(Main.draw, Main.config)
+    Main.rider = new Rider.Rider(Main.draw, Main.train)
+    sort()
+}
+
+function sort() {
+    Main.rider.legs.sgroup.back()
+    Main.rider.groups.pedal.back()
+    Main.rider.groups.crank.back()  
+    Main.train.group.back()
+    Main.rider.groups.frame.back()
 }
 
 function animate() {
@@ -67,27 +85,29 @@ function animate() {
     var step = function (timestamp) {
         dt = timestamp - previous
         previous = timestamp
-        train.step(dt)
+        Main.train.step(dt)
+        Main.rider.step()
         window.requestAnimationFrame(step)
     }
     window.requestAnimationFrame(step)
 }
 
 function createGears(config) {
-    return new Drive.DriveTrain(draw, config)
+    return new Drive.DriveTrain(Main.draw, config)
 }
 
 function changeMaster(event, ui) {
-    config.master.t = ui.value
+    Main.config.master.t = ui.value
     reset()
 }
 
 function changeSlave(event, ui) {
-    config.slave.t = ui.value
+    Main.config.slave.t = ui.value
     reset()
 }
 
 function changeSpeed(event, ui) {
-    config.speed = ui.value
-    train.master.setSpeed(ui.value)
+    Main.config.speed = ui.value
+    Main.train.master.setSpeed(ui.value)
+    $("#speed").text(Main.config.speed)
 }
