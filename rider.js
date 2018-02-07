@@ -21,6 +21,7 @@ Rider.Rider = function(draw, drive) {
         this.gear.x + this.crankLength + this.pedalLength / 2, this.gear.y)
         .stroke({ color: "#000", width: 12 })
     this.legs = new Rider.Legs(this)
+    this.wheel = new Rider.Wheel(this)
     this.groups.frame.svg(SVGE.frame).move(this.gear.x - 495, this.gear.y -590)
     this.pedalPos = this.getPedalPos()
 }
@@ -96,4 +97,12 @@ Rider.Legs.prototype.pedalAngle = function () {
 
 Rider.Legs.prototype.scaleneAngle = function (a, b, c) {
     return Math.acos(((b * b) + (c * c) - (a * a)) / (2 * b * c))
+}
+
+Rider.Wheel = function(rider) {
+    this.rider = rider
+    this.group = this.rider.sgroup.group()
+    this.group2 = this.rider.sgroup.group()
+    this.group.svg(SVGE.wheel).center(1232, 664)
+    this.group2.svg(SVGE.wheel).center(140, 664)
 }

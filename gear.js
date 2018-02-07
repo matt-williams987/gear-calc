@@ -30,14 +30,14 @@ Drive.DriveTrain = function (draw, c) {
     this.group = this.draw.group()
     // The 'master' gear contains the 'slave' gear, that is driven.
     this.master = new Drive.Gear(this.group, c.master.t, c.master.x, c.master.y, 
-        c.pitch, c.rollerDia, c.slave)
+        c.pitch, c.rollerDia, c.slave, c.initAngle)
     this.master.group.back()
     this.master.slave.group.back()
     // The 'middle' contains everything that is connected by the two gears (master and slave). It's
     // also responsible for masking out the relevant links sections of the master and slave
     // sprockets, for some reason.
     this.middle = new Drive.Middle(this.master)
-    this.master.setSpeed(c.speed)
+    this.master.setSpeed(c.speed) // Will be in degrees per milisecond
 }
 
 // Called every animation frame.
@@ -46,7 +46,7 @@ Drive.DriveTrain.prototype.step = function (dt) {
     this.middle.mesh()
 }
 
-Drive.Gear = function(gr, t, x, y, pitch, roll, slave) {
+Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle) {
     this.sgroup = gr
     this.slaveConf = slave
     this.x = x
@@ -54,7 +54,7 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave) {
     this.t = t // Number of teeth
     this.pitch = pitch // Distance between links
     this.roll = roll // Roller dimension
-    this.angle = 0 // Current rotation - in degrees
+    this.angle = initAngle // Current rotation - in degrees
     this.speed = 0.0 // Rotational speed
     // Circumradius of the gear polygon. Used for drawing links and the gear
     this.cr = this.pitch / (2 * Math.sin(Math.PI / this.t))
@@ -94,7 +94,7 @@ Drive.Gear.prototype.step = function(dt) {
 }
 
 Drive.Gear.prototype.setSpeed = function(speed) {
-    this.speed = speed * -0.01
+    this.speed = speed * -1
 }
 
 Drive.Gear.prototype.mesh = function(master) {

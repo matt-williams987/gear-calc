@@ -1,0 +1,18 @@
+{
+  "name": "gear-calc",
+  "version": "0.1.0",
+  "description": "An animated vector graphics bicycle gear calculator.",
+  "main": "index.html",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robotron9000/gear-calc.git"
+  },
+  "author": "",
+  "license": "ISC"
+}

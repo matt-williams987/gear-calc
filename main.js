@@ -5,7 +5,7 @@ var Main = {}
 Main.config = {
     pitch: 12.7,
     rollerDia: 7.93,
-    speed: 20,
+    speed: 0.36,
     slave: { 
         t: 18, 
         x: 1232, 
@@ -16,8 +16,10 @@ Main.config = {
         x: 802, 
         y: 745
     },
-    height: 1200,
-    width: 1500
+    height: 1100,
+    width: 1800,
+    rpmRate: 0.006,
+    initAngle: 0.0
 }
 
 Main.draw = {}
@@ -38,13 +40,13 @@ $(function () {
         slide: changeSlave,
         value: Main.config.slave.t
     })
-    $("#speed_slider").slider({
-        max: 150,
-        min: 0,
-        slide: changeSpeed,
-        value: Main.config.speed
-    })
     $("#rpm_slider").slider({
+        max: 270,
+        min: 0,
+        slide: changeRPM,
+        value: Main.config.speed / Main.config.rpmRate
+    })
+    $("#speed_slider").slider({
         max: 200,
         min: 0,
     })
@@ -64,7 +66,10 @@ function init() {
 function reset() {
     $("#m-teeth").text(Main.config.master.t)
     $("#s-teeth").text(Main.config.slave.t)
-    $("#speed").text(Main.config.speed)
+    $("#rpm").text(Main.config.speed / Main.config.rpmRate)
+    if (Main.train.master !== undefined) {
+        Main.config.initAngle = Main.train.master.angle
+    }
     Main.draw.clear()
     Main.train = new Drive.DriveTrain(Main.draw, Main.config)
     Main.rider = new Rider.Rider(Main.draw, Main.train)
@@ -92,10 +97,6 @@ function animate() {
     window.requestAnimationFrame(step)
 }
 
-function createGears(config) {
-    return new Drive.DriveTrain(Main.draw, config)
-}
-
 function changeMaster(event, ui) {
     Main.config.master.t = ui.value
     reset()
@@ -106,8 +107,14 @@ function changeSlave(event, ui) {
     reset()
 }
 
+function changeRPM(event, ui) {
+    Main.config.speed = ui.value * Main.config.rpmRate
+    Main.train.master.setSpeed(ui.value * Main.config.rpmRate)
+    $("#rpm").text(ui.value)
+}
+
 function changeSpeed(event, ui) {
-    Main.config.speed = ui.value
-    Main.train.master.setSpeed(ui.value)
-    $("#speed").text(Main.config.speed)
+    // First calculate the required RPM for a given speed
+    // Then call changeRPM
+    // changeRPM should be responsible for updating the speed display
 }
