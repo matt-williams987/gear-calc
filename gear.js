@@ -30,14 +30,14 @@ Drive.DriveTrain = function (draw, c) {
     this.group = this.draw.group()
     // The 'master' gear contains the 'slave' gear, that is driven.
     this.master = new Drive.Gear(this.group, c.master.t, c.master.x, c.master.y, 
-        c.pitch, c.rollerDia, c.slave, c.initAngle)
+        c.pitch, c.rollerDia, c.slave, c.initAngle, c.rpmRate)
     this.master.group.back()
     this.master.slave.group.back()
     // The 'middle' contains everything that is connected by the two gears (master and slave). It's
     // also responsible for masking out the relevant links sections of the master and slave
     // sprockets, for some reason.
     this.middle = new Drive.Middle(this.master)
-    this.master.setSpeed(c.speed) // Will be in degrees per milisecond
+    this.master.setSpeed(c.rpm)
 }
 
 // Called every animation frame.
@@ -46,7 +46,7 @@ Drive.DriveTrain.prototype.step = function (dt) {
     this.middle.mesh()
 }
 
-Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle) {
+Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle, rpmRate) {
     this.sgroup = gr
     this.slaveConf = slave
     this.x = x
@@ -56,6 +56,7 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle) {
     this.roll = roll // Roller dimension
     this.angle = initAngle // Current rotation - in degrees
     this.speed = 0.0 // Rotational speed
+    this.rpmRate = rpmRate
     // Circumradius of the gear polygon. Used for drawing links and the gear
     this.cr = this.pitch / (2 * Math.sin(Math.PI / this.t))
     // Inradius of the gear polygon. Used for calculating distances, offsets and mechanical stuff
@@ -76,8 +77,8 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle) {
     this.group.rotate(this.angle)
     // Create a slave gear if a slave configuration object has been passed in.
     if (this.slaveConf) {
-        x = this.slaveConf.x
-        y = this.slaveConf.y
+        x = this.x + this.slaveConf.x
+        y = this.y + this.slaveConf.y
         this.slave = new Drive.Gear(this.sgroup, this.slaveConf.t, x, y, this.pitch, this.roll)
     }
 }
@@ -93,8 +94,8 @@ Drive.Gear.prototype.step = function(dt) {
     }
 }
 
-Drive.Gear.prototype.setSpeed = function(speed) {
-    this.speed = speed * -1
+Drive.Gear.prototype.setSpeed = function(rpm) {
+    this.speed = rpm * this.rpmRate * -1
 }
 
 Drive.Gear.prototype.mesh = function(master) {

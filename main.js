@@ -1,26 +1,38 @@
 "use strict"
 
+var MM_PER_KM = 1000000
 var Main = {}
 
-Main.config = {
+ Main.state = {
     pitch: 12.7,
     rollerDia: 7.93,
-    speed: 0.36,
+    rpm: 0,
     slave: { 
         t: 18, 
-        x: 1232, 
-        y: 664
+        x: 430, 
+        y: -81
     },
     master: { 
-        t: 44,
-        x: 802, 
+        t: 48,
+        x: 1000, 
         y: 745
     },
     height: 1100,
     width: 1800,
     rpmRate: 0.006,
-    initAngle: 0.0
+    initAngle: 0.0,
+    wheelCircum: 2123.71,
+    rider: {
+        frontWheelX: -632, // Relative to master gear
+        frameOffsetX: -495,
+        frameOffsetY: -590,
+        wheelOffset: {
+            front: Math.random() * 360,
+            rear: Math.random() * 360
+        }
+    }
 }
+
 
 Main.draw = {}
 Main.rider = {}
@@ -29,26 +41,27 @@ Main.train = {}
 //on ready
 $(function () {
     $("#driver_slider").slider({
-        max: 60,
+        max: 70,
         min: 12,
-        value: Main.config.master.t,
+        value:  Main.state.master.t,
         slide: changeMaster
     })
     $("#slave_slider").slider({
         max: 48,
         min: 8,
         slide: changeSlave,
-        value: Main.config.slave.t
+        value:  Main.state.slave.t
     })
     $("#rpm_slider").slider({
         max: 270,
         min: 0,
         slide: changeRPM,
-        value: Main.config.speed / Main.config.rpmRate
+        value:  Main.state.rpm
     })
     $("#speed_slider").slider({
-        max: 200,
+        max: 258,
         min: 0,
+        slide: changeSpeed
     })
     $("#crank_length_slider").slider({
         max: 10,
@@ -58,21 +71,24 @@ $(function () {
 })
 
 function init() {
-    Main.draw = SVG("sprockets").viewbox(0, 0, Main.config.width, Main.config.height)
+    Main.draw = SVG("sprockets").viewbox(0, 0,  Main.state.width,  Main.state.height)
     reset()
     animate()
 }
 
 function reset() {
-    $("#m-teeth").text(Main.config.master.t)
-    $("#s-teeth").text(Main.config.slave.t)
-    $("#rpm").text(Main.config.speed / Main.config.rpmRate)
+    $("#m-teeth").text( Main.state.master.t)
+    $("#s-teeth").text( Main.state.slave.t)
+    $("#rpm").text( Main.state.rpm)
     if (Main.train.master !== undefined) {
-        Main.config.initAngle = Main.train.master.angle
+         Main.state.initAngle = Main.train.master.angle
+         Main.state.rider.wheelOffset.front = Main.rider.wheel.group2.transform().rotation
+         Main.state.rider.wheelOffset.rear = Main.rider.wheel.group.transform().rotation
     }
     Main.draw.clear()
-    Main.train = new Drive.DriveTrain(Main.draw, Main.config)
-    Main.rider = new Rider.Rider(Main.draw, Main.train)
+    Main.train = new Drive.DriveTrain(Main.draw,  Main.state)
+    Main.rider = new Rider.Rider(Main.draw, Main.train,  Main.state.rider)
+    updateSpeed( Main.state.rpm)
     sort()
 }
 
@@ -82,6 +98,8 @@ function sort() {
     Main.rider.groups.crank.back()  
     Main.train.group.back()
     Main.rider.groups.frame.back()
+    Main.rider.wheel.group.back()
+    Main.rider.wheel.group2.back()
 }
 
 function animate() {
@@ -91,30 +109,40 @@ function animate() {
         dt = timestamp - previous
         previous = timestamp
         Main.train.step(dt)
-        Main.rider.step()
+        Main.rider.step(dt)
         window.requestAnimationFrame(step)
     }
     window.requestAnimationFrame(step)
 }
 
 function changeMaster(event, ui) {
-    Main.config.master.t = ui.value
+     Main.state.master.t = ui.value
     reset()
 }
 
 function changeSlave(event, ui) {
-    Main.config.slave.t = ui.value
+     Main.state.slave.t = ui.value
     reset()
 }
 
 function changeRPM(event, ui) {
-    Main.config.speed = ui.value * Main.config.rpmRate
-    Main.train.master.setSpeed(ui.value * Main.config.rpmRate)
-    $("#rpm").text(ui.value)
+    Main.state.rpm = ui.value
+    Main.train.master.setSpeed( Main.state.rpm)
+    updateSpeed(Main.state.rpm)
 }
 
 function changeSpeed(event, ui) {
-    // First calculate the required RPM for a given speed
-    // Then call changeRPM
-    // changeRPM should be responsible for updating the speed display
+    Main.state.rpm = ((ui.value * MM_PER_KM / 60) / Main.state.wheelCircum / 
+        (Main.train.master.t / Main.train.master.slave.t))
+    Main.train.master.setSpeed(Main.state.rpm)
+    updateSpeed(Main.state.rpm)
+}
+
+function updateSpeed(rpm) {
+    var speed = rpm * (Main.train.master.t / Main.train.master.slave.t) 
+        * Main.state.wheelCircum / MM_PER_KM * 60
+    $("#speed").text(speed.toFixed(1))
+    $("#speed_slider").slider("value", speed)
+    $("#rpm").text(Main.state.rpm.toFixed(1))
+    $("#rpm_slider").slider("value", Main.state.rpm)
 }
