@@ -1,0 +1,45 @@
+@font-face {
+  font-family: "LCD";
+  src: url(LCD14.otf) format("truetype");
+}
+
+body {
+    background-color: #F5F5DC;
+}
+
+#sprockets {
+    max-width: 1000px; 
+    margin: auto;
+    margin-bottom: 30px;
+    border-radius: 30px;
+    padding: 0px;
+    overflow: hidden;
+}
+
+#controls {
+    max-width:1100px; 
+    text-align: center;
+    margin: auto;
+}
+
+.adjust {
+    width:400px; 
+    margin-top: 15px;
+    overflow: hidden; /* Otherwise it doesn't go around the floated child elements */
+    padding: 10px; /* Otherwise the slider handles get clipped */
+    display: inline-block;
+    margin: auto;
+}
+
+.slider {
+    float: left;
+    width: 250px;
+}
+
+.tracker {
+    float: right;
+    font-family: "LCD";
+    font-size: 25px;
+}
+
+

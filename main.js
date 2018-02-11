@@ -3,40 +3,42 @@
 var MM_PER_KM = 1000000
 var Main = {}
 
- Main.state = {
+Main.state = {
     pitch: 12.7,
     rollerDia: 7.93,
     rpm: 0,
     slave: { 
-        t: 18, 
-        x: 430, 
-        y: -81
+        t: 16, 
+        x: 417, 
+        y: -88
     },
     master: { 
-        t: 48,
+        t: 46,
         x: 1000, 
         y: 745
     },
     height: 1100,
-    width: 1800,
+    width: 2200,
     rpmRate: 0.006,
     initAngle: 0.0,
-    wheelCircum: 2123.71,
+    wheelDia: 676,
     rider: {
         frontWheelX: -632, // Relative to master gear
-        frameOffsetX: -495,
-        frameOffsetY: -590,
+        frameOffsetX: -505,
+        frameOffsetY: -599,
         wheelOffset: {
             front: Math.random() * 360,
             rear: Math.random() * 360
         }
     }
 }
-
+Main.state.wheelCircum = Main.state.wheelDia * Math.PI
+Main.state.rider.wheelDia = Main.state.wheelDia
 
 Main.draw = {}
 Main.rider = {}
 Main.train = {}
+Main.road = {}
 
 //on ready
 $(function () {
@@ -70,8 +72,31 @@ $(function () {
     init()
 })
 
+function changeMaster(event, ui) {
+    Main.state.master.t = ui.value
+    reset()
+}
+
+function changeSlave(event, ui) {
+    Main.state.slave.t = ui.value
+    reset()
+}
+
+function changeRPM(event, ui) {
+    Main.state.rpm = ui.value
+    Main.train.master.setSpeed(Main.state.rpm)
+    updateSpeed(Main.state.rpm)
+}
+
+function changeSpeed(event, ui) {
+    Main.state.rpm = ((ui.value * MM_PER_KM / 60) / Main.state.wheelCircum /
+        (Main.train.master.t / Main.train.master.slave.t))
+    Main.train.master.setSpeed(Main.state.rpm)
+    updateSpeed(Main.state.rpm)
+}
+
 function init() {
-    Main.draw = SVG("sprockets").viewbox(0, 0,  Main.state.width,  Main.state.height)
+    Main.draw = SVG("sprockets").viewbox(0, 0,  Main.state.width,  Main.state.height).style("display", "block")
     reset()
     animate()
 }
@@ -88,6 +113,7 @@ function reset() {
     Main.draw.clear()
     Main.train = new Drive.DriveTrain(Main.draw,  Main.state)
     Main.rider = new Rider.Rider(Main.draw, Main.train,  Main.state.rider)
+    Main.road = new Road.Road(Main.draw, Main.rider)
     updateSpeed( Main.state.rpm)
     sort()
 }
@@ -100,6 +126,7 @@ function sort() {
     Main.rider.groups.frame.back()
     Main.rider.wheel.group.back()
     Main.rider.wheel.group2.back()
+    Main.road.group.back()
 }
 
 function animate() {
@@ -110,36 +137,14 @@ function animate() {
         previous = timestamp
         Main.train.step(dt)
         Main.rider.step(dt)
+        Main.road.step()
         window.requestAnimationFrame(step)
     }
     window.requestAnimationFrame(step)
 }
 
-function changeMaster(event, ui) {
-     Main.state.master.t = ui.value
-    reset()
-}
-
-function changeSlave(event, ui) {
-     Main.state.slave.t = ui.value
-    reset()
-}
-
-function changeRPM(event, ui) {
-    Main.state.rpm = ui.value
-    Main.train.master.setSpeed( Main.state.rpm)
-    updateSpeed(Main.state.rpm)
-}
-
-function changeSpeed(event, ui) {
-    Main.state.rpm = ((ui.value * MM_PER_KM / 60) / Main.state.wheelCircum / 
-        (Main.train.master.t / Main.train.master.slave.t))
-    Main.train.master.setSpeed(Main.state.rpm)
-    updateSpeed(Main.state.rpm)
-}
-
 function updateSpeed(rpm) {
-    var speed = rpm * (Main.train.master.t / Main.train.master.slave.t) 
+    var speed = rpm * (Main.train.master.t / Main.train.master.slave.t)
         * Main.state.wheelCircum / MM_PER_KM * 60
     $("#speed").text(speed.toFixed(1))
     $("#speed_slider").slider("value", speed)
