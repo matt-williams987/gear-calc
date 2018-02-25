@@ -21,6 +21,8 @@
 var Drive = {}
 Drive.linkColor1 = "#aaa"
 Drive.linkColor2 = "#666"
+Drive.chainringColor = "#232323"
+Drive.sprocketColor = "#d6d6d6"
 
 // This is the top object that contains the drivetrain. It takes 'draw' as a SVJ.js drawing object
 // that elements will be placed in to, and c as the config.
@@ -28,9 +30,19 @@ Drive.DriveTrain = function (draw, c) {
     this.draw = draw
     // Create a new group to contain everything that will be created.
     this.group = this.draw.group()
-    // The 'master' gear contains the 'slave' gear, that is driven.
-    this.master = new Drive.Gear(this.group, c.master.t, c.master.x, c.master.y, 
-        c.pitch, c.rollerDia, c.slave, c.initAngle, c.rpmRate)
+    this.reset(c)
+}
+
+// Called every animation frame.
+Drive.DriveTrain.prototype.step = function(dt) {
+    this.master.step(dt)
+    this.middle.mesh()
+}
+
+Drive.DriveTrain.prototype.reset = function(c) {
+    this.group.clear()
+    this.master = new Drive.Gear(this.group, c.master.t, c.master.x, c.master.y,
+        c.pitch, c.rollerDia, c.slave, c.initAngle, c.rpmRate, Drive.chainringColor, 30)
     this.master.group.back()
     this.master.slave.group.back()
     // The 'middle' contains everything that is connected by the two gears (master and slave). It's
@@ -40,13 +52,7 @@ Drive.DriveTrain = function (draw, c) {
     this.master.setSpeed(c.rpm)
 }
 
-// Called every animation frame.
-Drive.DriveTrain.prototype.step = function (dt) {
-    this.master.step(dt)
-    this.middle.mesh()
-}
-
-Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle, rpmRate) {
+Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle, rpmRate, color) {
     this.sgroup = gr
     this.slaveConf = slave
     this.x = x
@@ -57,21 +63,23 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle, rpmRate) {
     this.angle = initAngle // Current rotation - in degrees
     this.speed = 0.0 // Rotational speed
     this.rpmRate = rpmRate
+    var padding = 3
+    var toothRatio = 1.4
     // Circumradius of the gear polygon. Used for drawing links and the gear
     this.cr = this.pitch / (2 * Math.sin(Math.PI / this.t))
     // Inradius of the gear polygon. Used for calculating distances, offsets and mechanical stuff
     this.r =  this.pitch / (2 * Math.tan(Math.PI / this.t)) 
     this.group = this.sgroup.group()
-    this.points = Drive.polyPoints(this.cr, this.t, this.x, this.y)
-    this.group.polygon(this.points).fill("#000")
+    this.points = Drive.polyPoints(this.cr + padding, this.t, this.x, this.y)
+    this.group.polygon(this.points).fill(color)
     var mask = this.group.mask()
-    var circ = this.group.circle(this.r*2).center(this.x, this.y).fill("#fff")
-    mask.add(circ)
+    mask.add(this.group.circle((this.cr + padding) *2).center(this.x, this.y).fill("#fff"))
     // Punch out circles at the vertexes of the polygon to give look of teeth
     for (var i =0; i < this.t; i++){
-        mask.add(this.group.circle(this.roll).fill("#000").center(
+        mask.add(this.group.circle(this.roll * toothRatio).fill("#000").center(
             this.points[i][0], this.points[i][1]))
     }
+    this.chainringCutouts(mask, this.cr * 0.4)
     this.group.maskWith(mask)
     this.links = new Drive.GearLinks(this)
     this.group.rotate(this.angle)
@@ -79,8 +87,25 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle, rpmRate) {
     if (this.slaveConf) {
         x = this.x + this.slaveConf.x
         y = this.y + this.slaveConf.y
-        this.slave = new Drive.Gear(this.sgroup, this.slaveConf.t, x, y, this.pitch, this.roll)
+        this.slave = new Drive.Gear(
+            this.sgroup, this.slaveConf.t, x, y, this.pitch, this.roll, 
+            false, 0, 0, Drive.sprocketColor)
     }
+}
+
+Drive.Gear.prototype.chainringCutouts = function(mask, margin) {
+    // TODO: Get rid of these hardcoded values.
+    var outerPoints = Drive.polyPoints(this.cr - 5, 20, this.x, this.y)
+    var innerPoints = Drive.polyPoints(5, 20, this.x, this.y)
+    mask.add(this.group.circle((this.cr - margin) * 2).center(this.x, this.y).fill("#000"))
+    for (var i = outerPoints.length - 1; i > 0; i -= 4) {
+        mask.add(this.group.polygon([[outerPoints[i][0], outerPoints[i][1]],
+                                     [outerPoints[i - 1][0], outerPoints[i - 1][1]],
+                                     [innerPoints[i - 1][0], innerPoints[i - 1][1]],
+                                     [innerPoints[i][0], innerPoints[i][1]],
+                                    ]).fill("#fff"))
+    }
+    mask.add(this.group.circle(50).fill("#fff").center(this.x, this.y))
 }
 
 // The master gear step function is the only one that takes in a delta time (dt) value. Everything

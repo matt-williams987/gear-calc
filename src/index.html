@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="lib/jquery-ui.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=500, initial-scale=1.0">
+</head>
+
+<body>
+    <div id="sprockets">
+    </div>
+
+    <div id="controls">
+
+        <fieldset class="field wideField">
+        <legend>CHAINRING TEETH</legend>
+        <div class="controlBits">
+                <div id="driver_slider" class="slider">     
+                </div>
+                <div class="tracker">
+                    <span id="m-teeth">
+                        0
+                    </span>
+                </div>
+        </div>
+        </fieldset>
+        
+        <fieldset class="field wideField">
+        <legend>SPROCKET TEETH</legend>
+        <div class="controlBits">
+            <div id="slave_slider" class="slider">
+            </div>
+            <div class="tracker">
+                <span id="s-teeth">
+                    0
+                </span>
+            </div>
+        </div>
+        </fieldset>
+
+        <fieldset class="field wideField">
+        <legend>CADENCE - RPM</legend>
+        <div class="controlBits">
+            <div id="rpm_slider" class="slider">
+            </div>
+            <div class="tracker">
+                <span id="rpm">
+                    0.0
+                </span>
+            </div>
+        </div>
+        </fieldset>
+        
+        <fieldset class="field wideField">
+        <legend>SPEED</legend>
+        <div class="controlBits">
+            <div id="speed_slider" class="slider">
+            </div>
+            <div class="tracker">
+                <span id="speed">
+                    0.0
+                </span>
+            </div>
+        </div>
+        </fieldset>
+
+
+        <br>
+        <fieldset class="field narrowField">
+        <legend>UNIT</legend>
+        <div class="controlBits">
+            <div id = "unit_picker" class="switch">
+            </div>
+            <div class="tracker">
+                <span id="unitTracker">
+                    KMH
+                </span>
+            </div>
+        </div>
+        </fieldset>
+
+        <fieldset class="field narrowField">
+        <legend>DRIVETRAIN ZOOM</legend>
+        <div class="controlBits">
+            <div id = "zoom_picker" class="switch">
+            </div>
+            <div class="tracker">
+                <span id="zoomTracker">
+                    OFF
+                </span>
+            </div>
+        </div>
+        </fieldset>
+
+    </div>
+
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jquery-ui.min.js"></script>
+    <script src="lib/jquery.ui.touch-punch.min.js"></script>
+    <script src="lib/svg.min.js"></script>
+    <script src="svgelements.js"></script>
+    <script src="gear.js"></script>
+    <script src="rider.js"></script>
+    <script src="road.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

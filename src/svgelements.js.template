@@ -1,0 +1,21 @@
+SVGE = {}
+
+SVGE.frame = ' {frame} '
+
+SVGE.wheel = ' {wheel} '
+
+SVGE.foot =  ' {foot} '
+
+SVGE.footBack =  ' {footBack} '
+
+SVGE.lowerLeg = ' {lower} '
+
+SVGE.upperLeg = ' {upper} '
+
+SVGE.lowerLegBack = ' {lowerBack} '
+
+SVGE.upperLegBack = ' {upperBack} '
+
+SVGE.frameRear = ' {frameRear} '
+
+SVGE.crank = ' {crank} '

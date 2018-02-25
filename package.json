@@ -7,12 +7,22 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.js",
+    "watch": "watch \"npm run build\" src resources --ignoreDotFiles --wait 2",
+    "distribute" : "node build.js distribute"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/robotron9000/gear-calc.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "shelljs": "^0.8.1",
+    "string-template": "^1.0.0",
+    "svg.js": "^2.6.4",
+    "uglify-js": "^3.3.12"
+  },
+  "dependencies": {}
 }

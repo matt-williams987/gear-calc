@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <g>
+    <g>
+      <title>Layer 1</title>
+      <g id="svg_29">
+        <rect width="0" fill="#56aaff" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="round" stroke-linecap="null" x="1120.73268" y="854.12584" height="14.00476" id="svg_30"/>
+        <polygon id="svg_40" fill="#56aaff"/>
+        <rect stroke="#000000" stroke-width="0" x="345.157" y="1003.326" width="138.179" height="20.88" transform="matrix(-0.978925, 0.204218, -0.216281, -0.976404, 1471.743664, 1432.93437)" id="svg_12" stroke-linejoin="round" style="fill: rgb(171, 77, 79);"/>
+        <rect stroke="#000000" stroke-width="0" x="546.509" y="445.997" width="249.118" height="22.18" transform="matrix(-0.561741, -0.827313, 0.842798, -0.538936, 830.379085, 1202.541183)" id="svg_11" stroke-linejoin="round" style="fill: rgb(171, 77, 79);"/>
+        <rect stroke="#000000" stroke-width="0" x="372.589" y="1473.587" width="142.109" height="7.267" transform="matrix(-0.978925, 0.204218, -0.216278, -0.976415, 1603.294313, 1885.941823)" stroke-linejoin="round" id="svg_28" style="fill: rgb(88, 21, 22);"/>
+        <rect transform="matrix(0.562949, 0.826492, -0.842033, 0.54014, 933.770739, -106.91424)" id="svg_27" height="6.286" width="264.996" y="370.106" x="251.568" stroke-linecap="null" stroke-linejoin="round" stroke-dasharray="null" stroke-width="0" stroke="#000000" style="fill: rgb(88, 21, 22);"/>
+      </g>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 0.675666, -0.801351)">
+      <title>Dropout</title>
+      <polygon style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" points="907.618 536.877"/>
+      <polygon style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" points="948.337 498.509"/>
+      <polygon style="fill: rgb(88, 21, 22);" points="904.286 511.632 892.296 528.078 956.635 523.402 960.784 516.211 923.971 516.211 923.971 505.144 960.018 505.144 957.805 496.848 891.358 491.04" transform=""/>
+    </g>
+    <path d="M 466.49 337.48 Q 467 337.186 467.51 337.48 L 474.989 341.799 Q 475.499 342.093 475.499 342.682 L 475.499 351.318 Q 475.499 351.907 474.989 352.201 L 467.51 356.52 Q 467 356.814 466.49 356.52 L 459.011 352.201 Q 458.501 351.907 458.501 351.318 L 458.501 342.682 Q 458.501 342.093 459.011 341.799 Z" transform="matrix(0.961481, -0.274859, 0.274845, 0.961485, 395.469099, 304.176168)" style="fill: rgb(158, 158, 158);" bx:shape="n-gon 467 347 9.814 9.814 6 0.06 1@ccc7ea17"/>
+    <ellipse transform="matrix(0.296398, -0.955062, 0.955065, 0.296397, 843.348544, 579.662519)" cx="95.66" cy="71.356" rx="5.904" ry="5.904" style="fill: rgb(58, 52, 52);"/>
+  </g>
+</svg>
