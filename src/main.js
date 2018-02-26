@@ -22,6 +22,7 @@ Main.state = {
         x: 1300, 
         y: 745
     },
+    reset: false,
     height: 1100,
     width: 2200,
     rpmRate: 0.006,
@@ -86,12 +87,12 @@ $(function () {
 
 function changeMaster(event, ui) {
     Main.state.master.t = ui.value
-    reset()
+    Main.state.reset = true
 }
 
 function changeSlave(event, ui) {
     Main.state.slave.t = ui.value
-    reset()
+    Main.state.reset = true
 }
 
 function changeRPM(event, ui) {
@@ -157,6 +158,9 @@ function reset() {
     Main.state.rider.wheelOffset.front = Main.rider.wheel.front.angle
     Main.state.rider.wheelOffset.rear = Main.rider.wheel.front.angle
     recreateDrawing()
+    Main.train.step(0)
+    Main.rider.step(0)
+    Main.road.step()
     updateSpeed( Main.state.rpm)
 }
 
@@ -189,12 +193,19 @@ function sort() {
 function animate() {
     var previous = 0
     var dt = 0
+    var lastReset = 0
     var step = function (timestamp) {
+        if (Main.state.reset === true && lastReset > 3) {
+            reset()
+            lastReset = 0;
+            Main.state.reset = false
+        }
         dt = timestamp - previous
         previous = timestamp
         Main.train.step(dt)
         Main.rider.step(dt)
         Main.road.step()
+        lastReset++;
         window.requestAnimationFrame(step)
     }
     window.requestAnimationFrame(step)
