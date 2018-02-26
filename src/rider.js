@@ -86,7 +86,7 @@ Rider.Foot.prototype.getPos = function () {
 
 Rider.Foot.prototype.step = function() {
     var pos = this.pedal.getPos()
-    this.svg.move(pos.x, pos.y)
+    this.svg.transform({x: pos.x, y: pos.y})
     var crankAngle = Math.abs((this.pedal.gear.angle + this.halfTurn) % 360)
     var position = (crankAngle + this.limits.angleOffset) % 360
     if (position > this.limits.tippingPont) {
@@ -97,7 +97,7 @@ Rider.Foot.prototype.step = function() {
         var progress = this.ease(position / this.limits.tippingPont)
         this.angle = -(this.limits.steep - ((this.limits.steep - this.limits.shallow) * progress))
     }
-    this.svg.rotate(this.angle, 0, 0)
+    this.svg.transform({rotation: this.angle})
     this.leg.step()
 }
 
@@ -128,9 +128,8 @@ Rider.Leg.prototype.step = function () {
     var x = this.geo.upper.length * Math.cos(ha + angle)
     var y = this.geo.upper.length * Math.sin(ha + angle)
     this.upper.rotate(Drive.toDeg(angle + ha), 0, 0)
-    this.lower.move(this.geo.upper.x + x, + this.geo.upper.y + y)
-    this.lower.rotate(Drive.toDeg(angle + ha + ka - Math.PI), 0, 0)
-    
+    this.lower.transform({ x: this.geo.upper.x + x, y: this.geo.upper.y + y })
+    this.lower.transform({rotation: Drive.toDeg(angle + ha + ka - Math.PI)})
 }
 
 // Gets the distance between the hip joint and the 
