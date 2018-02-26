@@ -156,7 +156,7 @@ Drive.GearLinks = function (gear) {
     // to right like in the gear calculator. If there are an odd number of teeth, GearLinks needs
     // to leave a gap in the wrapped links. This makes sure that the gap on the slave gear points
     // in and is not seen. This assumes the slave is on the right. Sad.
-    if (this.g.slaveConf === undefined) {
+    if (this.g.slaveConf === false) {
         this.rotOffset = this.arcStep * Math.ceil(this.g.t / 4)
     } else {
         this.rotOffset = 0
