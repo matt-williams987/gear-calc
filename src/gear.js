@@ -152,10 +152,6 @@ Drive.GearLinks = function (gear) {
     }
     this.points = points
     this.arcStep = Drive.toDeg((Math.PI * 2) / this.g.t * 2)
-    // This is a terrible hack that means sprocket drawing only works when gears are arranged left
-    // to right like in the gear calculator. If there are an odd number of teeth, GearLinks needs
-    // to leave a gap in the wrapped links. This makes sure that the gap on the slave gear points
-    // in and is not seen. This assumes the slave is on the right. Sad.
     if (this.g.slaveConf === false) {
         this.rotOffset = this.arcStep * Math.ceil(this.g.t / 4)
     } else {
