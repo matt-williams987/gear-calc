@@ -6,7 +6,7 @@ var MILES_PER_KM = 0.621371
 var Main = {}
 
 
-// TODO: Get rid of this ridiculous "state" thing and make it a config. State should be held by the
+// TODO: Get rid of this ridiculous "state" thing and make it a config. State can be held by the
 // various objects
 Main.state = {
     pitch: 12.7,
@@ -120,12 +120,15 @@ function changeUnits(event, ui) {
 }
 
 function changeZoom(event, ui) {
-    console.log("zooming")
     if (ui.value == 0) {
         Main.draw.animate().viewbox(0, 0, Main.state.width, Main.state.height)
         $("#zoomTracker").text("OFF")
     } else {
-        Main.draw.animate().viewbox(1000, 450, 1000 + 200, 450 + 100)
+        // Main.draw.animate().viewbox(1000, 800, 500, 225)
+        var width = 690
+        var x = 1100
+        var y = 560
+        Main.draw.animate().viewbox({ x: x, y: y, width: width, height: width / 2})
         $("#zoomTracker").text("ON")
     }
 }
@@ -143,7 +146,6 @@ function init() {
     $("#m-teeth").text(Main.state.master.t)
     $("#s-teeth").text(Main.state.slave.t)
     $("#rpm").text(Main.state.rpm.toFixed(1))
-    // $("#speed").text((speed * Main.state.unitConversion).toFixed(1))
     Main.draw = SVG("sprockets").viewbox(0, 0,  Main.state.width,  Main.state.height)
         .style("display", "block")
     recreateDrawing()
