@@ -39,7 +39,8 @@ function createDist() {
         "src/rider.js",
         "src/road.js",
         "src/styles.css",
-        "resources/LCD14.otf"
+        "resources/LCD14.otf",
+        "resources/title.svg"
     ]
     shell.cp(toCopy, "dist/")
     shell.cp("node_modules/svg.js/dist/svg.min.js", "dist/lib/svg.min.js")
