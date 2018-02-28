@@ -30,6 +30,7 @@ Rider.Rider.prototype.step = function(dt) {
 }
 
 Rider.Pedal = function(rider, front) {
+    var svg = front ? SVGE.crank : SVGE.backCrank
     this.setup = {
         crankLength: 165,
         crankMargin: 8
@@ -37,7 +38,7 @@ Rider.Pedal = function(rider, front) {
     this.multiplier = front ? 1: -1
     this.rider = rider
     this.gear = this.rider.train.master
-    this.crank = this.rider.draw.group().svg(SVGE.crank).move(this.gear.x, this.gear.y)
+    this.crank = this.rider.draw.group().svg(svg).move(this.gear.x, this.gear.y)
     this.foot = new Rider.Foot(this, front)
 }
 

@@ -19,3 +19,5 @@ SVGE.upperLegBack = ' {upperBack} '
 SVGE.frameRear = ' {frameRear} '
 
 SVGE.crank = ' {crank} '
+
+SVGE.backCrank = ' {backCrank} '

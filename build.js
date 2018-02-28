@@ -27,7 +27,8 @@ function createDist() {
         upperBack: "resources/upperBack.svg",
         wheel: "resources/wheel.svg",
         frameRear: "resources/frameRear.svg",
-        crank: "resources/crank.svg"
+        crank: "resources/crank.svg",
+        backCrank : "resources/backCrank.svg"
     }
     svgElements(svgFiles)
 
@@ -40,7 +41,8 @@ function createDist() {
         "src/road.js",
         "src/styles.css",
         "resources/LCD14.otf",
-        "resources/title.svg"
+        "resources/title.svg",
+        "resources/favicon-pkg/dist/*"
     ]
     shell.cp(toCopy, "dist/")
     shell.cp("node_modules/svg.js/dist/svg.min.js", "dist/lib/svg.min.js")
