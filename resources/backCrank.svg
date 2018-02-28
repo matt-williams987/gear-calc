@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1, 0, 0, 1, 244.60407534392562, 192.78050631215478)">
+    <rect x="-417.504" y="-206.371" width="190.278" height="28" rx="14" ry="14" style="fill: rgb(35, 35, 35);"/>
+    <ellipse transform="matrix(-0.799994, 0.600006, -0.600008, -0.799994, -246.694435, -101.222578)" cx="70.378" cy="167.344" rx="5.865" ry="5.865" style="fill: rgb(148, 148, 148);"/>
+  </g>
+</svg>
