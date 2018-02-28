@@ -216,7 +216,7 @@ Drive.Chainline.prototype.getDrawOffset = function () {
     var dp = (origin[0] * intercept[0]) + (origin[1] * intercept[1])
     var mag = Math.hypot(origin[0], origin[1]) * Math.hypot(intercept[0], intercept[1])
     var t = Math.acos(dp / mag)
-    return ((t % (this.arcStep * 2)) - this.arcStep) * this.gear.r//
+    return ((t % (this.arcStep * 2)) - this.arcStep) * this.gear.r
 }
 
 Drive.Chainline.prototype.mesh = function() {

@@ -37,6 +37,22 @@ Main.state = {
             front: Math.random() * 360,
             rear: Math.random() * 360
         }
+    },
+    limits : {
+        sprocket: {
+            max: 42,
+            min: 8
+        },
+        chainring: {
+            max: 70,
+            min: 28
+        },
+        speed: {
+            max: 150
+        },
+        rpm: {
+            max: 200
+        }
     }
 }
 Main.state.wheelCircum = Main.state.wheelDia * Math.PI
@@ -50,37 +66,37 @@ Main.road = {}
 //on ready
 $(function () {
     $("#driver_slider").slider({
-        max: 70,
-        min: 28,
+        max: Main.state.limits.chainring.max,
+        min: Main.state.limits.chainring.min,
         value:  Main.state.master.t,
-        slide: changeMaster
+        slide: changeMaster,
     })
     $("#slave_slider").slider({
-        max: 42,
-        min: 8,
+        max: Main.state.limits.sprocket.max,
+        min: Main.state.limits.sprocket.min,
         slide: changeSlave,
-        value:  Main.state.slave.t
+        value:  Main.state.slave.t,
     })
     $("#rpm_slider").slider({
-        max: 200,
+        max: Main.state.limits.rpm.max,
         min: 0,
         slide: changeRPM,
-        value:  Main.state.rpm
+        value:  Main.state.rpm,
     })
     $("#speed_slider").slider({
-        max: 150,
+        max: Main.state.limits.speed.max,
         min: 0,
-        slide: changeSpeed
+        slide: changeSpeed,
     })
     $("#unit_picker").slider({
         max: 1,
         min: 0,
-        slide: changeUnits
+        slide: changeUnits,
     })
     $("#zoom_picker").slider({
         max: 1,
         min: 0,
-        slide: changeZoom
+        slide: changeZoom,
     })
     init()
 })
@@ -124,7 +140,6 @@ function changeZoom(event, ui) {
         Main.draw.animate().viewbox(0, 0, Main.state.width, Main.state.height)
         $("#zoomTracker").text("OFF")
     } else {
-        // Main.draw.animate().viewbox(1000, 800, 500, 225)
         var width = 690
         var x = 1100
         var y = 560
@@ -137,25 +152,35 @@ function updateSpeed(rpm) {
     var speed = rpm * (Main.train.master.t / Main.train.master.slave.t)
         * Main.state.wheelCircum / MM_PER_KM * 60
     $("#speed").text((speed * Main.state.unitConversion).toFixed(1))
+    if (speed > Main.state.limits.speed.max) {
+        $("#speed").css('color', '#701112')
+    } else {
+        $("#speed").css('color', 'black')
+    }
     $("#speed_slider").slider("value", speed)
     $("#rpm").text(Main.state.rpm.toFixed(1))
+    if (rpm > Main.state.limits.rpm.max) {
+        $("#rpm").css('color', '#701112')
+    } else {
+        $("#rpm").css('color', 'black')
+    }
     $("#rpm_slider").slider("value", Main.state.rpm)
 }
 
 function init() {
     $("#m-teeth").text(Main.state.master.t)
     $("#s-teeth").text(Main.state.slave.t)
-    $("#rpm").text(Main.state.rpm.toFixed(1))
+    // $("#rpm").text(Main.state.rpm.toFixed(1))
     Main.draw = SVG("sprockets").viewbox(0, 0,  Main.state.width,  Main.state.height)
         .style("display", "block")
     recreateDrawing()
+    updateSpeed(Main.state.rpm)
     animate()
 }
 
 function reset() {
     $("#m-teeth").text( Main.state.master.t)
     $("#s-teeth").text( Main.state.slave.t)
-    $("#rpm").text( Main.state.rpm)
     Main.state.initAngle = Main.train.master.angle
     Main.state.rider.wheelOffset.front = Main.rider.wheel.front.angle
     Main.state.rider.wheelOffset.rear = Main.rider.wheel.front.angle
