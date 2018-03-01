@@ -1,3 +1,4 @@
+// SVG Elements
 SVGE = {}
 
 SVGE.frame = ' {frame} '

@@ -1,3 +1,5 @@
+// I should have made this sensible. This demands so much typing every time something is added.
+
 const fs = require('fs')
 const format = require("string-template")
 const shell = require('shelljs')
