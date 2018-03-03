@@ -3,7 +3,7 @@
 
 ## Help
 
-Pedal Furiously is a an animated bicycle gear calculator. The speed of the bike is calculated based on an approximately 700 x 28c wheel size. 
+Pedal Furiously is a an animated bicycle gear calculator. The speed of the bike is calculated based on an approximate 700 x 28c wheel size. 
 
 *Hint: use arrow keys to adjust values precisely.*
 
@@ -50,8 +50,8 @@ If anyone knows how to fix this, please tell me.
 ### My takeaways from making this
 
 - Knowing the difference between [sprockets](https://en.wikipedia.org/wiki/Sprocket) and [gears](https://en.wikipedia.org/wiki/Gear)
-- Knowing animating complex SVG in a high performance way in a browser is kind of hard
-- Knowing simple things (like bicycle gears) can be surprisingly complex
+- Knowing that animating complex SVG in a high performance way in a browser is kind of hard
+- Knowing that simple things (like bicycle gears) can be surprisingly complex
 
 [Go to calculator](https://pedalfuriously.neocities.org/)
 
