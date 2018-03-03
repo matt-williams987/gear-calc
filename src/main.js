@@ -82,11 +82,13 @@ $(function () {
         min: 0,
         slide: changeRPM,
         value:  Main.state.rpm,
+        stop: sliderStop
     })
     $("#speed_slider").slider({
         max: Main.state.limits.speed.max,
         min: 0,
         slide: changeSpeed,
+        stop: sliderStop
     })
     $("#unit_picker").slider({
         max: 1,
@@ -112,16 +114,22 @@ function changeSlave(event, ui) {
 }
 
 function changeRPM(event, ui) {
-    Main.state.rpm = ui.value
+    var rpm = ui.value > Main.state.limits.rpm.max ? Main.state.limits.rpm.max : ui.value
+    // var speed = rpm * (Main.train.master.t / Main.train.master.slave.t)
+    //     * Main.state.wheelCircum / MM_PER_KM * 60
+    // Main.state.rpm = speed > Main.state.limits.speed.max ? Main.state.rpm : rpm
+    Main.state.rpm = rpm
     Main.train.master.setSpeed(Main.state.rpm)
-    updateSpeed(Main.state.rpm)
+    updateSpeedDisplay(Main.state.rpm)
 }
 
 function changeSpeed(event, ui) {
-    Main.state.rpm = ((ui.value * MM_PER_KM / 60) / Main.state.wheelCircum /
+    var speed = ui.value
+    var rpm = ((speed * MM_PER_KM / 60) / Main.state.wheelCircum /
         (Main.train.master.t / Main.train.master.slave.t))
+    Main.state.rpm = rpm > Main.state.limits.rpm.max ? Main.state.limits.rpm.max : rpm
     Main.train.master.setSpeed(Main.state.rpm)
-    updateSpeed(Main.state.rpm)
+    updateSpeedDisplay(Main.state.rpm)
 }
 
 function changeUnits(event, ui) {
@@ -132,7 +140,7 @@ function changeUnits(event, ui) {
         Main.state.unitConversion = MILES_PER_KM
         $("#unitTracker").text("MPH")
     }
-    updateSpeed(Main.state.rpm)
+    updateSpeedDisplay(Main.state.rpm)
 }
 
 function changeZoom(event, ui) {
@@ -148,7 +156,12 @@ function changeZoom(event, ui) {
     }
 }
 
-function updateSpeed(rpm) {
+function sliderStop(event, ui) {
+    updateSpeedDisplay(Main.state.rpm)
+}
+
+
+function updateSpeedDisplay(rpm) {
     var speed = rpm * (Main.train.master.t / Main.train.master.slave.t)
         * Main.state.wheelCircum / MM_PER_KM * 60
     $("#speed").text((speed * Main.state.unitConversion).toFixed(1))
@@ -170,11 +183,10 @@ function updateSpeed(rpm) {
 function init() {
     $("#m-teeth").text(Main.state.master.t)
     $("#s-teeth").text(Main.state.slave.t)
-    // $("#rpm").text(Main.state.rpm.toFixed(1))
     Main.draw = SVG("sprockets").viewbox(0, 0,  Main.state.width,  Main.state.height)
         .style("display", "block")
     recreateDrawing()
-    updateSpeed(Main.state.rpm)
+    updateSpeedDisplay(Main.state.rpm)
     animate()
 }
 
@@ -188,7 +200,7 @@ function reset() {
     Main.train.step(0)
     Main.rider.step(0)
     Main.road.step()
-    updateSpeed( Main.state.rpm)
+    updateSpeedDisplay( Main.state.rpm)
 }
 
 function recreateDrawing() {
