@@ -3,7 +3,7 @@
 
 ## Help
 
-Pedal Furiously is a an animated bicycle gear calculator. sThe peed of the bike is calculated based on an approximately 700 x 28c wheel size. 
+Pedal Furiously is a an animated bicycle gear calculator. The speed of the bike is calculated based on an approximately 700 x 28c wheel size. 
 
 *Hint: use arrow keys to adjust values precisely.*
 
@@ -37,7 +37,7 @@ If anyone knows how to fix this, please tell me.
 
 ### Animating SVG, Or Why is my Computer Melting?
 
-I could have made this in [WebGL](https://en.wikipedia.org/wiki/WebGL) with something like [PixiJS](www.pixijs.com). That would have been smart. But I was smitten with the concept of vector graphics, and [SVG in particular](https://youtu.be/SeLOt_BRAqc). Smooth and clean at any resolution. Super small file sizes. Infinite zoom. Vectors are the pizels of the future!
+I could have made this in [WebGL](https://en.wikipedia.org/wiki/WebGL) with something like [PixiJS](www.pixijs.com). That would have been smart. But I was smitten with the concept of vector graphics, and [SVG](https://youtu.be/SeLOt_BRAqc). Smooth and clean at any resolution. Super small file sizes. Infinite zoom. Vectors are the pizels of the future!
 
 I knew about the performance risks of triggerring a [browser paint](https://developers.google.com/web/fundamentals/performance/rendering/#the_pixel_pipeline) too often, and I was trying to avoid it. I was doing well, until the yellow road lines came in to the picture. The road lines are basically one big fat dashed yellow line that shuttles itself back and forth accross the view box at the right speed. This means that large sections of it are invisibly poking out the side of the view box at any time. Unfortunately, it looks like bits poking out (even invisible ones) always trigger a paint. 
 
