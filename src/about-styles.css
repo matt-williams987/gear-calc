@@ -1,0 +1,91 @@
+    a:link {
+        text-decoration: none;
+        color: #2b72bb;
+    }
+
+    a:visited {
+        text-decoration: none;
+        color: #2b72bb;
+    }
+
+    a:hover {
+        text-decoration: none;
+        color: #215992;
+    }
+
+    a:active {
+        text-decoration: none;
+        color: #215992;
+    }
+
+    body {
+       background-color:  #FCFCFC;
+       color: #242729; 
+       font-family: Verdana, sans-serif;
+       width: 700px;
+       max-width: 95%;
+       margin: auto;
+       margin-top: 15px;
+       margin-bottom: 7px;
+    }
+    
+    p {        
+        font-size: 16px;
+    }
+
+    h1 { 
+        font-size: 36px;
+        font-weight:bold;
+        border-bottom: 1px solid #6d6d6d;
+        padding-bottom: 5px;
+        margin-top: 15px;
+        margin-bottom: 7px;
+    }
+    h2 { 
+        font-size: 22px;
+        font-weight:bold;
+        border-bottom: 1px solid #6d6d6d;
+        padding-bottom: 5px;
+        margin-top: 15px;
+        margin-bottom: 7px;
+        
+    }
+    h3 { 
+        font-size: 18px;
+        font-weight:bold;
+        padding-bottom: 5px;
+        margin-top: 15px;
+        margin-bottom: 7px;
+    }
+
+
+    img {
+        max-width: 100%
+    }
+
+    hr {
+        /* width: 700px; */
+        /* max-width: 95%; */
+        margin: auto;
+        height: 5px;
+        background-color:#242729;
+        color: #242729;
+        border: 0 none;
+        border-radius: 7px;
+    }
+
+    #content {   
+        /* width: 700px; */
+        /* max-width: 95%; */
+        margin: auto;
+        margin-bottom: 30px;
+
+    }
+
+    #disqus_thread {
+        width: 80%;
+        max-width: 90%;
+        margin: auto;
+        padding: 10px;
+        margin-top: 20px;
+    }

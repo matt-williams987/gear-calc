@@ -1,9 +1,10 @@
-// I should have made this sensible. This demands so much typing every time something is added.
+// I should have made this sensible. This needs so much typing every time something is added.
 
 const fs = require('fs')
 const format = require("string-template")
 const shell = require('shelljs')
 const UglifyJS = require("uglify-js")
+const marked = require("marked")
 
 shell.rm("-rf", "dist/")
 createDist()
@@ -33,6 +34,7 @@ function createDist() {
         backCrank : "resources/backCrank.svg"
     }
     svgElements(svgFiles)
+    aboutPage()
 
     // Move everything to dist directory
     var toCopy = [
@@ -42,9 +44,12 @@ function createDist() {
         "src/rider.js",
         "src/road.js",
         "src/styles.css",
+        "src/about-styles.css",
         "resources/LCD14.otf",
         "resources/title.svg",
-        "resources/favicon-pkg/dist/*"
+        "resources/favicon-pkg/dist/*",
+        "early-gears.gif"
+
     ]
     shell.cp(toCopy, "dist/")
     shell.cp("node_modules/svg.js/dist/svg.min.js", "dist/lib/svg.min.js")
@@ -61,6 +66,14 @@ function svgElements(changes) {
     }
     file = format(file, replacements)
     fs.writeFileSync("dist/svgelements.js", file)
+}
+
+function aboutPage() {
+    var file = fs.readFileSync("src/about.html", "utf8")
+    var md = fs.readFileSync("readme.md", "utf8")
+    md = marked(md)
+    file = format(file, {readmeContents: md})
+    fs.writeFileSync("dist/about.html", file)
 }
 
 function compressScripts() {
