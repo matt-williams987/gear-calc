@@ -115,9 +115,6 @@ function changeSlave(event, ui) {
 
 function changeRPM(event, ui) {
     var rpm = ui.value > Main.state.limits.rpm.max ? Main.state.limits.rpm.max : ui.value
-    // var speed = rpm * (Main.train.master.t / Main.train.master.slave.t)
-    //     * Main.state.wheelCircum / MM_PER_KM * 60
-    // Main.state.rpm = speed > Main.state.limits.speed.max ? Main.state.rpm : rpm
     Main.state.rpm = rpm
     Main.train.master.setSpeed(Main.state.rpm)
     updateSpeedDisplay(Main.state.rpm)

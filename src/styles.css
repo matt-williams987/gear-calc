@@ -87,6 +87,18 @@ p {
     font-weight: normal;
 }
 
+/* https://stackoverflow.com/questions/31953377/increase-jquery-slider-handle-clickable-area */
+.ui-slider-handle:after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  padding: 28px 28px;
+  left: -28px;
+  top: -28px;
+  cursor: pointer;
+}
 
 
 
