@@ -100,6 +100,11 @@ $(function () {
         min: 0,
         slide: changeZoom,
     })
+    $("#hold-picker").slider({
+        max: 1,
+        min: 0,
+        slide: changeZoom,
+    })
     init()
 })
 
