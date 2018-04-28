@@ -2,6 +2,7 @@
 
 var MM_PER_KM = 1000000
 var MILES_PER_KM = 0.621371
+var INCHES_PER_MM = 0.0393
 
 var Main = {}
 
@@ -180,6 +181,8 @@ function updateSpeedDisplay(rpm) {
         $("#rpm").css('color', 'black')
     }
     $("#rpm_slider").slider("value", Main.state.rpm)
+    var diameterInches = Main.state.wheelDia * INCHES_PER_MM
+    $("#gear-inches").text((diameterInches * (Main.state.master.t / Main.state.slave.t)).toFixed(1))
 }
 
 function init() {
