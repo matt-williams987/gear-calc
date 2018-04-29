@@ -24,6 +24,8 @@ Main.state = {
         y: 745
     },
     reset: false,
+    hold: false,
+    speed: 0,
     height: 1100,
     width: 2200,
     rpmRate: 0.006,
@@ -104,17 +106,22 @@ $(function () {
     $("#hold-picker").slider({
         max: 1,
         min: 0,
-        slide: changeZoom,
+        value: 0,
+        slide: changeHold,
     })
     init()
 })
 
 function changeMaster(event, ui) {
+    Main.state.speed = Main.state.rpm * (Main.train.master.t / Main.train.master.slave.t)
+        * Main.state.wheelCircum / MM_PER_KM * 60
     Main.state.master.t = ui.value
     Main.state.reset = true
 }
 
 function changeSlave(event, ui) {
+    Main.state.speed = Main.state.rpm * (Main.train.master.t / Main.train.master.slave.t)
+        * Main.state.wheelCircum / MM_PER_KM * 60
     Main.state.slave.t = ui.value
     Main.state.reset = true
 }
@@ -133,6 +140,16 @@ function changeSpeed(event, ui) {
     Main.state.rpm = rpm > Main.state.limits.rpm.max ? Main.state.limits.rpm.max : rpm
     Main.train.master.setSpeed(Main.state.rpm)
     updateSpeedDisplay(Main.state.rpm)
+}
+
+function changeHold(event, ui) {
+    if (ui.value === 0) {
+        Main.state.hold = false
+        $("#hold-tracker").text("CAD")
+    } else {
+        Main.state.hold = true
+        $("#hold-tracker").text("SPD")
+    }
 }
 
 function changeUnits(event, ui) {
@@ -202,15 +219,20 @@ function reset() {
     Main.state.rider.wheelOffset.front = Main.rider.wheel.front.angle
     Main.state.rider.wheelOffset.rear = Main.rider.wheel.front.angle
     recreateDrawing()
+    // Running a couple of empty steps seems to help with "floating" limb graphical issue.
     Main.train.step(0)
     Main.rider.step(0)
     Main.road.step()
-    updateSpeedDisplay( Main.state.rpm)
+    if (Main.state.hold) {
+        Main.state.rpm = ((Main.state.speed * MM_PER_KM / 60) / Main.state.wheelCircum /
+            (Main.train.master.t / Main.train.master.slave.t))
+        Main.train.master.setSpeed(Main.state.rpm)
+    }
+    updateSpeedDisplay(Main.state.rpm)
 }
 
 function recreateDrawing() {
     Main.draw.clear()
-    // TODO - No need to recreate rider and road completely each time, probably.
     Main.train = new Drive.DriveTrain(Main.draw, Main.state)
     Main.rider = new Rider.Rider(Main.draw, Main.train, Main.state.rider)
     Main.road = new Road.Road(Main.draw, Main.rider)

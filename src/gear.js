@@ -12,8 +12,6 @@
 //    head around, although it's definitely possible. The behaviour at the moment is to mesh the
 //    chain only with the master gear. There are formulas to determine the "center-center" distance
 //    for two sprockets, but I don't seem to be able to make this work for my setup.
-//
-// 3. It's disorganised beyond beleif
 
 "use strict"
 /*global SVG:true*/
