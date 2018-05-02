@@ -31,7 +31,9 @@ p {
     overflow: hidden;
     border-width: 10px;
     border-color:  rgb(231, 231, 213);
-    border-style: inset
+    border-style: inset;
+    /* Mirror the whole image horizontally, because I put the chainring on the wrong side. */
+    transform: scale(-1,1);
 }
 
 #controls {
