@@ -3,15 +3,15 @@
 var MM_PER_KM = 1000000
 var MILES_PER_KM = 0.621371
 var INCHES_PER_MM = 0.0393
+var LCD_COLOR = 'black'
+var LCD_WARNING = '#701112'
 
 var Main = {}
 
-
-// TODO: Get rid of this ridiculous "state" thing and make it a config. State can be held by the
-// various objects
 Main.state = {
     pitch: 12.7,
     rollerDia: 7.93,
+    // This is updated by the controls, and passed in to the drivetrains setSpeed() function
     rpm: 0.0,
     slave: { 
         t: 16, 
@@ -25,7 +25,7 @@ Main.state = {
     },
     reset: false,
     hold: false,
-    speed: 0,
+    speed: 0, // This is stored only when resetting, to re-create the animation at the same speed
     height: 1100,
     width: 2200,
     rpmRate: 0.006,
@@ -54,7 +54,7 @@ Main.state = {
             max: 150
         },
         rpm: {
-            max: 200
+            max: 230
         }
     }
 }
@@ -186,16 +186,16 @@ function updateSpeedDisplay(rpm) {
         * Main.state.wheelCircum / MM_PER_KM * 60
     $("#speed").text((speed * Main.state.unitConversion).toFixed(1))
     if (speed > Main.state.limits.speed.max) {
-        $("#speed").css('color', '#701112')
+        $("#speed").css('color', LCD_WARNING)
     } else {
-        $("#speed").css('color', 'black')
+        $("#speed").css('color', LCD_COLOR)
     }
     $("#speed_slider").slider("value", speed)
     $("#rpm").text(Main.state.rpm.toFixed(1))
     if (rpm > Main.state.limits.rpm.max) {
-        $("#rpm").css('color', '#701112')
+        $("#rpm").css('color', LCD_WARNING)
     } else {
-        $("#rpm").css('color', 'black')
+        $("#rpm").css('color', LCD_COLOR)
     }
     $("#rpm_slider").slider("value", Main.state.rpm)
     var diameterInches = Main.state.wheelDia * INCHES_PER_MM
@@ -226,11 +226,15 @@ function reset() {
     if (Main.state.hold) {
         Main.state.rpm = ((Main.state.speed * MM_PER_KM / 60) / Main.state.wheelCircum /
             (Main.train.master.t / Main.train.master.slave.t))
-        Main.train.master.setSpeed(Main.state.rpm)
     }
+    if (Main.state.rpm > Main.state.limits.rpm.max) {
+        Main.state.rpm = Main.state.limits.rpm.max
+    }
+    Main.train.master.setSpeed(Main.state.rpm)
     updateSpeedDisplay(Main.state.rpm)
 }
 
+// Doesn't so much recreate the drawing as recreate the world.
 function recreateDrawing() {
     Main.draw.clear()
     Main.train = new Drive.DriveTrain(Main.draw, Main.state)
@@ -261,6 +265,7 @@ function animate() {
     var dt = 0
     var lastReset = 0
     var step = function (timestamp) {
+        // Don't allow resetting too often, as it will destroy the framerate.
         if (Main.state.reset === true && lastReset > 3) {
             reset()
             lastReset = 0;

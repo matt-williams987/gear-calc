@@ -1,5 +1,5 @@
 // The Drive object contains all the bits to draw and animate a drivetrain with varying sprocket
-// sizes. There are two great tragedies with Drive:
+// sizes. There are two problems with it.
 //
 // 1. It takes a heck of a lot of processing power to keep the svg animation going. I have managed
 //    to avoid any browser paints, but it still seems to spend a lot of time in the layout and
@@ -92,7 +92,7 @@ Drive.Gear = function(gr, t, x, y, pitch, roll, slave, initAngle, rpmRate, color
 }
 
 Drive.Gear.prototype.chainringCutouts = function(mask, margin) {
-    // TODO: Get rid of these hardcoded values.
+    // TODO: Get rid of these hardcoded values. I'm not sure what they even mean now.
     var outerPoints = Drive.polyPoints(this.cr - 5, 20, this.x, this.y)
     var innerPoints = Drive.polyPoints(5, 20, this.x, this.y)
     mask.add(this.group.circle((this.cr - margin) * 2).center(this.x, this.y).fill("#000"))
@@ -107,7 +107,7 @@ Drive.Gear.prototype.chainringCutouts = function(mask, margin) {
 }
 
 // The master gear step function is the only one that takes in a delta time (dt) value. Everything
-// else uses a "mesh" method to base location on current position of master gear.
+// else uses a "mesh" method to base it's position on current position of master gear.
 Drive.Gear.prototype.step = function(dt) {
     this.angle += dt * this.speed
     this.group.rotate(this.angle)
