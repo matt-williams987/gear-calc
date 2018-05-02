@@ -17,7 +17,7 @@ p {
         margin-top: 0px;
         margin-bottom: 0px;
         padding: 0px;
-        font-size: 14px;
+        font-size: 18px;
         font-family: "Courier New", Courier, monospace;
 }
 
@@ -88,7 +88,7 @@ p {
 }
 
 /* https://stackoverflow.com/questions/31953377/increase-jquery-slider-handle-clickable-area */
-.ui-slider-handle:after {
+.ui-slider-handle:after .ui-slider-handle:active, .ui-slider-handle:focus {
   content: "";
   display: block;
   position: absolute;
@@ -98,8 +98,8 @@ p {
   left: -28px;
   top: -28px;
   cursor: pointer;
+  outline: none;
 }
-
 
 
 
