@@ -5,7 +5,11 @@
 
 Pedal Furiously is a an animated bicycle gear calculator. The speed of the bike is calculated based on an approximate 700 x 28c wheel size. 
 
-*Hint: use arrow keys to adjust values precisely.*
+### Tips
+- Use your arrow keys to adjust values more precisely.
+- You can chose between miles per hour and kilometers per hour.
+- You can choose to hold either the cadence or the speed steady while adjusting sprocket sizes. The chosen value will hold steady, unless it goes over the maximum allowed.
+
 
 ## About
 
