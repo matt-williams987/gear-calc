@@ -1,0 +1,3 @@
+Build Instructions
+Do 'node build.js distribute' in top level
+It will put things in the dist folder
